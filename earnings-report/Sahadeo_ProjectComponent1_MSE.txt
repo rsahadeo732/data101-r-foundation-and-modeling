@@ -1,0 +1,94 @@
+> library(rpart)
+> library(rpart.plot)
+> 
+> # Read the data
+> EarningsTrain <- read.csv("C:/Users/supaq/OneDrive/Desktop/Rutgers Courses/Data 101 - Spring 2024/R Code/EarningsTrain.csv")
+> EarningsTest <- read.csv("C:/Users/supaq/OneDrive/Desktop/Rutgers Courses/Data 101 - Spring 2024/R Code/EarningsTest.csv")
+> 
+> # New Predictor multiplying Number Of Professional Connections by GPA
+> EarningsTrain$New_Predictor <- EarningsTrain$GPA * EarningsTrain$Number_Of_Professional_Connections
+> EarningsTest$New_Predictor <- EarningsTest$GPA * EarningsTest$Number_Of_Professional_Connections 
+> 
+> #New predictor 
+> EarningsTrain$New_Predictor2 <- EarningsTrain$New_Predictor * EarningsTrain$Number_Of_Credits
+> EarningsTest$New_Predictor2 <- EarningsTest$New_Predictor * EarningsTest$Number_Of_Credits
+> 
+> #New predictor 
+> EarningsTrain$New_Predictor3 <- EarningsTrain$New_Predictor2 * EarningsTrain$Height
+> EarningsTest$New_Predictor3 <- EarningsTest$New_Predictor2 * EarningsTest$Height
+> 
+> #New predictor 
+> EarningsTrain$New_Predictor4 <- EarningsTrain$New_Predictor3 * EarningsTrain$GPA
+> EarningsTest$New_Predictor4 <- EarningsTest$New_Predictor3 * EarningsTest$GPA
+> 
+> #rpart
+> model <- rpart(formula = Earnings ~ New_Predictor2 + GPA + Number_Of_Professional_Connections + Major + Graduation_Year + Number_Of_Credits
++                + New_Predictor + New_Predictor3 + New_Predictor4, 
++                data = EarningsTrain, method = "anova",control = rpart.control(cp = 0.00005, minsplit = 30))
+> 
+> #View model
+> model
+n= 7500 
+
+node), split, n, deviance, yval
+      * denotes terminal node
+
+ 1) root 7500 3.327345e+10 10599.070  
+   2) Major=Other 741 1.843225e+09  5793.326  
+     4) Number_Of_Professional_Connections< 59.5 704 3.308020e+08  5488.041  
+       8) Number_Of_Professional_Connections< 31.5 579 4.047257e+07  5214.613  
+        16) Number_Of_Professional_Connections< 18.5 430 3.256328e+06  5076.731  
+          32) Number_Of_Professional_Connections< 11.5 334 4.283362e+05  5035.724 *
+          33) Number_Of_Professional_Connections>=11.5 96 3.122871e+05  5219.401 *
+        17) Number_Of_Professional_Connections>=18.5 149 5.449217e+06  5612.528  
+          34) Number_Of_Professional_Connections< 25.5 90 7.687070e+05  5478.564 *
+          35) Number_Of_Professional_Connections>=25.5 59 6.015260e+05  5816.879 *
+       9) Number_Of_Professional_Connections>=31.5 125 4.653235e+07  6754.562  
+        18) Number_Of_Professional_Connections< 43.5 78 4.376382e+06  6345.737  
+          36) Number_Of_Professional_Connections< 37.5 50 6.254015e+05  6194.199 *
+          37) Number_Of_Professional_Connections>=37.5 28 5.524926e+05  6616.339 *
+        19) Number_Of_Professional_Connections>=43.5 47 7.483694e+06  7433.038  
+          38) Number_Of_Professional_Connections< 50.5 31 1.028949e+06  7188.242 *
+          39) Number_Of_Professional_Connections>=50.5 16 9.978200e+05  7907.330 *
+     5) Number_Of_Professional_Connections>=59.5 37 1.984112e+08 11601.990  
+      10) Number_Of_Professional_Connections< 83 21 2.621583e+07  9927.094 *
+      11) Number_Of_Professional_Connections>=83 16 3.596475e+07 13800.280 *
+   3) Major=Buisness,Humanities,Professional,STEM,Vocational 6759 1.244049e+10 11125.940  
+     6) Major=Buisness,Humanities,STEM 3710 2.399077e+08  9997.589  
+      12) Major=Buisness,STEM 2239 8.204679e+07  9832.064  
+        24) Major=STEM 1488 3.298966e+06  9749.620  
+          48) GPA>=2.495 757 6.452492e+05  9712.981 *
+          49) GPA< 2.495 731 5.851612e+05  9787.562 *
+        25) Major=Buisness 751 4.859447e+07  9995.415 *
+      13) Major=Humanities 1471 3.142348e+06 10249.530  
+        26) GPA< 2.505 741 6.519950e+05 10214.080 *
+        27) GPA>=2.505 730 6.139438e+05 10285.520 *
+     7) Major=Professional,Vocational 3049 1.729676e+09 12498.900  
+      14) Major=Professional 1529 3.234314e+06 11749.330  
+        28) GPA>=2.535 718 5.247320e+05 11711.030 *
+        29) GPA< 2.535 811 7.230699e+05 11783.250 *
+      15) Major=Vocational 1520 3.218412e+06 13252.900  
+        30) GPA< 2.545 789 6.544799e+05 13218.390 *
+        31) GPA>=2.545 731 6.095928e+05 13290.160 *
+> 
+> #Plot
+> rpart.plot(model)
+> 
+> #Evaluate the rpart using MSE
+> EarningsTrain$pred.Earnings <- predict(model, newdata = EarningsTrain)
+> MSE <- mean((EarningsTrain$Earnings - EarningsTrain$pred.Earnings)^2)
+> 
+> #Predictions
+> EarningsTest$pred.Earnings <- predict(model, newdata = EarningsTest)
+> 
+> #Write to EarningsTest.csv
+> write.csv(EarningsTest, "C:/Users/supaq/OneDrive/Desktop/Rutgers Courses/Data 101 - Spring 2024/R Code/EarningsTest.csv", row.names = FALSE)
+> 
+> #Round MSE
+> rounded_MSE <- round(MSE, digits = 3)
+> 
+> #Print MSE
+> print(paste("MSE:", rounded_MSE))
+[1] "MSE: 16146.506"
+> 
+> 
