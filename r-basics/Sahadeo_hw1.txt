@@ -1,0 +1,18 @@
+> c1 <- c('Q', 'W', 'E', 'R', 'T', 'Y', 'U')
+> 
+> v1 <- c(1,2,3,4,5,6,7)
+> v2 <- c(8,9,10,11,12,13,14)
+> 
+> hw1 <- data.frame(cbind(c1, v1, v2))
+> 
+> hw1$v3 <- v1+v2
+> 
+> min_v3 <- min(hw1$v3)
+> 
+> max_v3 <- max(hw1$v3)
+> 
+> cat("Minimun of v3:", min_v3, "\n")
+Minimun of v3: 9 
+> cat("Maximun of v3:", max_v3, "\n")
+Maximun of v3: 21 
+> 
