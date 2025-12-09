@@ -1,0 +1,22 @@
+> # Estimates
+> prof_estimated <- c(0.05, 0.30, 0.40, 0.20, 0.05)
+> 
+> # Actual
+> actual_absences <- c(6, 29, 38, 22, 5)
+> 
+> # Total students
+> total_students <- sum(actual_absences)
+> 
+> # Frequency of absences
+> expected_freq <- prof_estimated * total_students
+> 
+> # Chi-squared test
+> chi_square <- chisq.test(x = actual_absences, p = prof_estimated)
+> 
+> # Calculate p-value
+> p_value <- chi_square$p.value
+> 
+> # Print the p-value
+> print(p_value)
+[1] 0.9701759
+> 
